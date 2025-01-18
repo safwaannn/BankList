@@ -51,7 +51,7 @@ const account2 = {
 
 const account3 = {
   owner: 'shahid mubin Sayyad',
-  movements: [200, -200, 340, -300, -20, 50, 400, -3210, -1000, 8500, -30],
+  movements: [200, -200, 340, -300, -20, 50, 400, 3210, -1000, 8500, -30],
   interestRate: 0.7,
   pin: 3333,
 
