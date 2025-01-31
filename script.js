@@ -357,10 +357,11 @@ btnLoan.addEventListener('click', function (e) {
     setTimeout(function () {
       currentAccount.movements.push(amount);
       currentAccount.movementsDates.push(new Date().toISOString());
-      saveAccounts();
 
       // Update UI
       updateUI(currentAccount);
+      saveAccounts();
+
       // reset time
       clearInterval(timer);
       timer = startLogOutTimer();
