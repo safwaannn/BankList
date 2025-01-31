@@ -89,7 +89,17 @@ const account4 = {
   locale: 'en-IN',
 };
 
-const accounts = [account1, account2, account3, account4];
+let accounts = [account1, account2, account3, account4];
+// Replace the original 'const accounts' declaration with:
+// let accounts;
+
+// Load accounts from localStorage or use defaults
+const savedAccounts = localStorage.getItem('accounts');
+if (savedAccounts) {
+  accounts = JSON.parse(savedAccounts);
+} else {
+  accounts = [account1, account2, account3, account4];
+}
 
 /////////////////////////////////////////////////
 // Elements
@@ -199,14 +209,29 @@ const calcDisplaySummary = function (acc) {
 
 const createUsernames = function (accs) {
   accs.forEach(function (acc) {
+    if (!acc.username) {
+      // Add this check
+      acc.username = acc.owner
+        .toLowerCase()
+        .split(' ')
+        .map(name => name[0])
+        .join('');
+    }
+  });
+};
+/* const createUsernames = function (accs) {
+  accs.forEach(function (acc) {
     acc.username = acc.owner
       .toLowerCase()
       .split(' ')
       .map(name => name[0])
       .join('');
   });
-};
+}; */
 createUsernames(accounts);
+const saveAccounts = () => {
+  localStorage.setItem('accounts', JSON.stringify(accounts));
+};
 
 const updateUI = function (acc) {
   // Display movements
@@ -218,13 +243,6 @@ const updateUI = function (acc) {
   // Display summary
   calcDisplaySummary(acc);
 };
-// const now = new Date();
-// const day = `${now.getDate()}`.padStart(2, 0);
-// const month = ` ${now.getMonth() + 1}`.padStart(2, 0);
-// const year = now.getFullYear();
-// const hours = `${now.getHours()}`.padStart(2, 0);
-// const min = `${now.getMinutes()}`.padStart(2, 0);
-// console.log(`AS of${day}/${month}/${year},${hours}:${min}`);
 
 const startLogOutTimer = function () {
   const tick = function () {
@@ -289,13 +307,6 @@ btnLogin.addEventListener('click', function (e) {
       options
     ).format(now);
 
-    // const day = `${now.getDate()}`.padStart(2, 0);
-    // const month = ` ${now.getMonth() + 1}`.padStart(2, 0);
-    // const year = now.getFullYear();
-    // const hours = `${now.getHours()}`.padStart(2, 0);
-    // const min = `${now.getMinutes()}`.padStart(2, 0);
-    // labelDate.textContent = `${day} / ${month} / ${year} , ${hours}:${min}`;
-
     // Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
@@ -332,6 +343,7 @@ btnTransfer.addEventListener('click', function (e) {
     // reset time
     clearInterval(timer);
     timer = startLogOutTimer();
+    saveAccounts();
   }
 });
 
@@ -345,6 +357,8 @@ btnLoan.addEventListener('click', function (e) {
     setTimeout(function () {
       currentAccount.movements.push(amount);
       currentAccount.movementsDates.push(new Date().toISOString());
+      saveAccounts();
+
       // Update UI
       updateUI(currentAccount);
       // reset time
@@ -370,6 +384,7 @@ btnClose.addEventListener('click', function (e) {
 
     // Delete account
     accounts.splice(index, 1);
+    saveAccounts();
 
     // Hide UI
     containerApp.style.opacity = 0;
